@@ -11,6 +11,7 @@
     <modules>
         <module>base</module>
         <module>day-1</module>
+        <module>day-2</module>
     </modules>
     <packaging>pom</packaging>
 
