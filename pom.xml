@@ -10,8 +10,8 @@
 
     <modules>
         <module>base</module>
-        <module>day-1</module>
-        <module>day-2</module>
+        <module>2023</module>
+        <module>2022</module>
     </modules>
     <packaging>pom</packaging>
 
