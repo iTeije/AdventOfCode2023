@@ -16,27 +16,11 @@ public class DayTwoPartOne {
             String[] arguments = str.split(" ");
             Choice myChoice = Choice.valueOf(arguments[1]);
 
-            points += myChoice.getResult(arguments[0].charAt(0)).getPoints();
+            points += myChoice.getResult(arguments[0].charAt(0));
             points += myChoice.points;
         }
 
         System.out.println("Result (2022 D2P1): " + points);
-    }
-
-    enum Result {
-        WIN(6),
-        DRAW(3),
-        LOST(0);
-
-        private final int points;
-
-        Result(int points) {
-            this.points = points;
-        }
-
-        public int getPoints() {
-            return this.points;
-        }
     }
 
     enum Choice {
@@ -54,14 +38,10 @@ public class DayTwoPartOne {
             this.points = points;
         }
 
-        public Result getResult(char opponentChoice) {
-            if (beats == opponentChoice) {
-                return Result.WIN;
-            }
-            if (equivalent == opponentChoice) {
-                return Result.DRAW;
-            }
-            return Result.LOST;
+        public int getResult(char opponentChoice) {
+            if (beats == opponentChoice) return 6;
+            if (equivalent == opponentChoice) return 3;
+            return 0;
         }
     }
 }
