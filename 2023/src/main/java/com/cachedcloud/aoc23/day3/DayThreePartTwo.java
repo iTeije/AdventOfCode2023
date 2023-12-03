@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DayThreePartOne {
+public class DayThreePartTwo {
 
     private final static Map<Integer, Map<Integer, Value>> table = new HashMap<>();
     private final static List<OffsetPair> pairs = List.of(
@@ -47,15 +47,16 @@ public class DayThreePartOne {
                 if (!value.symbol) return;
 
                 // Get surrounding numbers
-                total.getAndAdd(getSurroundingNumbers(x, y));
+                total.getAndAdd(getValidGearRatios(x, y));
             });
         });
 
         System.out.println("Result (2023 D3P1): " + total.get());
     }
 
-    public static int getSurroundingNumbers(int x, int y) {
-        int total = 0;
+    public static int getValidGearRatios(int x, int y) {
+        List<Integer> foundValues = new ArrayList<>();
+
         List<OffsetPair> restrictedPairs = new ArrayList<>();
         for (OffsetPair pair : pairs) {
             if (restrictedPairs.contains(pair)) continue;
@@ -103,11 +104,11 @@ public class DayThreePartOne {
                 xOffset--;
             }
 
-            total += Integer.parseInt(builder.toString());
-            System.out.println(builder.toString());
+            foundValues.add(Integer.parseInt(builder.toString()));
         }
 
-        return total;
+        if (foundValues.size() != 2) return 0;
+        return foundValues.get(0) * foundValues.get(1);
     }
 
     static class Value {
