@@ -45,6 +45,7 @@ public class DayThreePartTwo {
             rows.forEach((x, value) -> {
                 // Check if value is symbol
                 if (!value.symbol) return;
+                if (!(value.character == '*')) return;
 
                 // Get surrounding numbers
                 total.getAndAdd(getValidGearRatios(x, y));
