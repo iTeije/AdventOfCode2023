@@ -10,10 +10,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalLong;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.LongStream;
 
 public class DayFivePartTwo {
 
@@ -68,8 +70,7 @@ public class DayFivePartTwo {
 
         // Loop through seed ranges
         seedRanges.parallelStream().forEach(range -> {
-            long lowestNumber = Long.MAX_VALUE;
-            for (long seed = range.start; seed < range.computedEnd; seed++) {
+            OptionalLong optionalLong = LongStream.range(range.start, range.computedEnd).map(seed -> {
                 long correspondingNumber = seed;
                 categoryLoop:
                 // Loop through all categories until the input number (starting off with the seed) finds a mapping that is in range
@@ -84,11 +85,11 @@ public class DayFivePartTwo {
                         }
                     }
                 }
-                // Cache final location number
-                if (correspondingNumber < lowestNumber) lowestNumber = correspondingNumber;
                 finished.getAndIncrement();
-            }
-            locationNumbers.add(lowestNumber);
+                return correspondingNumber;
+            }).min();
+
+            locationNumbers.add(optionalLong.orElse(Long.MAX_VALUE));
         });
 
         // Sort list of location numbers from lowest to highest
