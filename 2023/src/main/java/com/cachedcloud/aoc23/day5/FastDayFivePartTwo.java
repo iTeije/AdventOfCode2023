@@ -11,13 +11,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.LongStream;
 
-public class DayFivePartTwo {
+public class FastDayFivePartTwo {
 
     public static void main(String[] args) {
         Timer.start();
@@ -61,16 +58,12 @@ public class DayFivePartTwo {
         List<List<Mapping>> cachedMappingValues = new ArrayList<>(mappings.values());
         List<Long> locationNumbers = new ArrayList<>();
 
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-        long finalAmountOfSeeds = amountOfSeeds;
-        scheduler.scheduleAtFixedRate(() -> {
-            printProgress(finalAmountOfSeeds, finished.get());
-        }, 1, 1, TimeUnit.SECONDS);
-
         // Loop through seed ranges
         seedRanges.parallelStream().forEach(range -> {
-            OptionalLong optionalLong = LongStream.range(range.start, range.computedEnd).map(seed -> {
+            List<SeedRange> additionalRanges = new ArrayList<>();
+
+            AtomicLong previous = new AtomicLong(0);
+            OptionalLong optionalLong = generateLongStream(range).map(seed -> {
                 long correspondingNumber = seed;
                 categoryLoop:
                 // Loop through all categories until the input number (starting off with the seed) finds a mapping that is in range
@@ -86,45 +79,73 @@ public class DayFivePartTwo {
                     }
                 }
                 finished.getAndIncrement();
+                double calc = (double) previous.get() / correspondingNumber;
+                if (calc > 1.2 || calc < 0.8) {
+                    SeedRange newRange = new SeedRange(seed - 1000, 1000);
+                    System.out.println("Adding new range from " + seed + " to " + newRange.computedEnd);
+                    additionalRanges.add(newRange);
+                }
+                previous.set(correspondingNumber);
                 return correspondingNumber;
             }).min();
 
-            locationNumbers.add(optionalLong.orElse(Long.MAX_VALUE));
+            long altMin = Long.MAX_VALUE;
+            for (SeedRange altRange : additionalRanges) {
+                OptionalLong secondOptionalLong = LongStream.range(altRange.start, altRange.computedEnd).map(seed -> {
+                    long correspondingNumber = seed;
+                    categoryLoop:
+                    // Loop through all categories until the input number (starting off with the seed) finds a mapping that is in range
+                    for (List<Mapping> category : cachedMappingValues) {
+                        for (Mapping mapping : category) {
+                            // Get output from mapping (-1 if not in range)
+                            long result = mapping.getOutput(correspondingNumber);
+                            // If the input is in range of the mapping, save the number and continue to the next category
+                            if (result != -1) {
+                                correspondingNumber = result;
+                                continue categoryLoop;
+                            }
+                        }
+                    }
+                    finished.getAndIncrement();
+                    return correspondingNumber;
+                }).min();
+
+                altMin = Math.min(secondOptionalLong.orElse(Long.MAX_VALUE), altMin);
+            }
+
+            locationNumbers.add(Math.min(optionalLong.orElse(Long.MAX_VALUE), altMin));
         });
 
         // Sort list of location numbers from lowest to highest
         Collections.sort(locationNumbers);
 
-        System.out.println("\nResult (2023 D5P2): " + locationNumbers.get(0));
+        System.out.println("Result (2023 D5P2): " + locationNumbers.get(0));
         Timer.finish();
-
-        scheduler.shutdown();
     }
 
-    private static void printProgress(long total, long currentCompletedItems) {
-        double progressPercentage = (double) currentCompletedItems / total * 100;
+    private static LongStream generateLongStream(SeedRange range) {
+        LongStream.Builder builder = LongStream.builder();
 
-        // Print progress as a progress bar
-        System.out.print("\rProgress: [");
-        int progressChars = (int) (currentCompletedItems / (double) total * 50);
-        for (int i = 0; i < 50; i++) {
-            System.out.print(i < progressChars ? "=" : " ");
+        // Add first values
+        long i = range.start;
+        while (i % 1000 != 0) {
+            builder.add(i);
+            i++;
         }
-        System.out.print("] ");
 
-        // Print progress as raw amounts
-        System.out.print("Completed: " + currentCompletedItems + "/" + total);
-
-        // Print progress as a percentage
-        System.out.printf(" (%.2f%%)", progressPercentage);
-
-        // Flush to ensure the output is displayed
-        System.out.flush();
-
-        if (currentCompletedItems == total) {
-            System.out.println("\nShutting down progress thread.");
-            Thread.currentThread().interrupt();
+        // Add values in range (every 1000)
+        i = range.start;
+        while (i < range.computedEnd) {
+            builder.add(i);
+            i+= 1000;
         }
+
+        // Add last values
+        for (i = range.computedEnd - (range.computedEnd % 1000); i < range.computedEnd; i++) {
+            builder.add(i);
+        }
+
+        return builder.build();
     }
 
     static class Mapping {
