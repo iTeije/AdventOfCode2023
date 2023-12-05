@@ -16,23 +16,24 @@ import java.util.stream.LongStream;
 
 public class FastDayFivePartTwo {
 
+    // Configuration
+    private static int SPREAD = 1000;
+    private static double DIFF = 0.1;
+
     public static void main(String[] args) {
         Timer.start();
+
         List<String> input = new FileReader("input-day5.txt").getInputAsStrings();
 
         List<Long> seeds = Arrays.stream(input.get(0).substring(7).split(" ")).map(Long::valueOf).toList();
         input = input.subList(2, input.size());
 
         List<SeedRange> seedRanges = new ArrayList<>();
-        long amountOfSeeds = 0;
         for (int i = 0; i < seeds.size(); i+=2) {
             long range = seeds.get(i + 1);
 
             seedRanges.add(new SeedRange(seeds.get(i), range));
-            amountOfSeeds += range;
         }
-
-        System.out.println(seedRanges.size() + " pairs with a total of " + amountOfSeeds + " seeds.");
 
         Map<Integer, LinkedList<Mapping>> mappings = new HashMap<>();
         int index = 0;
@@ -52,11 +53,12 @@ public class FastDayFivePartTwo {
             mappings.get(index).add(new Mapping(Long.parseLong(parts[0]), Long.parseLong(parts[1]), Long.parseLong(parts[2])));
         }
 
-        AtomicLong finished = new AtomicLong();
-
         // Attempts to reduce overhead
         List<List<Mapping>> cachedMappingValues = new ArrayList<>(mappings.values());
         List<Long> locationNumbers = new ArrayList<>();
+
+        double upper = 1 + DIFF;
+        double lower = 1 - DIFF;
 
         // Loop through seed ranges
         seedRanges.parallelStream().forEach(range -> {
@@ -78,19 +80,27 @@ public class FastDayFivePartTwo {
                         }
                     }
                 }
-                finished.getAndIncrement();
+
+                /*
+                Check if the final location is much different from the previous location.
+                If so, it is confirmed that this seed has a different path through the mappings
+                than the previous one, which means that we should process the surrounding seeds
+                as well.
+                 */
                 double calc = (double) previous.get() / correspondingNumber;
-                if (calc > 1.2 || calc < 0.8) {
-                    SeedRange newRange = new SeedRange(seed - 1000, 1000);
-                    System.out.println("Adding new range from " + seed + " to " + newRange.computedEnd);
+                if (calc > upper || calc < lower) {
+                    SeedRange newRange = new SeedRange(seed - SPREAD, SPREAD);
                     additionalRanges.add(newRange);
                 }
+
                 previous.set(correspondingNumber);
                 return correspondingNumber;
             }).min();
 
-            long altMin = Long.MAX_VALUE;
-            for (SeedRange altRange : additionalRanges) {
+            // Perform the same calculation on the seed ranges that were added in the previous
+            // calculation.
+            AtomicLong altMin = new AtomicLong(Long.MAX_VALUE);
+            additionalRanges.parallelStream().forEach(altRange -> {
                 OptionalLong secondOptionalLong = LongStream.range(altRange.start, altRange.computedEnd).map(seed -> {
                     long correspondingNumber = seed;
                     categoryLoop:
@@ -106,14 +116,13 @@ public class FastDayFivePartTwo {
                             }
                         }
                     }
-                    finished.getAndIncrement();
                     return correspondingNumber;
                 }).min();
 
-                altMin = Math.min(secondOptionalLong.orElse(Long.MAX_VALUE), altMin);
-            }
+                altMin.set(Math.min(secondOptionalLong.orElse(Long.MAX_VALUE), altMin.get()));
+            });
 
-            locationNumbers.add(Math.min(optionalLong.orElse(Long.MAX_VALUE), altMin));
+            locationNumbers.add(Math.min(optionalLong.orElse(Long.MAX_VALUE), altMin.get()));
         });
 
         // Sort list of location numbers from lowest to highest
@@ -123,26 +132,28 @@ public class FastDayFivePartTwo {
         Timer.finish();
     }
 
+    /**
+     * Generate an optimized LongStream that only includes one in every thousand seeds. If the
+     * final location differs too much from the previous seed, it will process the seeds
+     * around it as well.
+     *
+     * @param range the seed-range
+     * @return the generated {@link LongStream}
+     */
     private static LongStream generateLongStream(SeedRange range) {
         LongStream.Builder builder = LongStream.builder();
 
         // Add first values
-        long i = range.start;
-        while (i % 1000 != 0) {
-            builder.add(i);
-            i++;
+        for (int i = 0; i <= SPREAD; i++) {
+            builder.add(range.start + i);
+            builder.add(range.computedEnd - i);
         }
 
-        // Add values in range (every 1000)
-        i = range.start;
+        // Add values in range (every specified number of times)
+        long i = range.start;
         while (i < range.computedEnd) {
             builder.add(i);
-            i+= 1000;
-        }
-
-        // Add last values
-        for (i = range.computedEnd - (range.computedEnd % 1000); i < range.computedEnd; i++) {
-            builder.add(i);
+            i+= SPREAD;
         }
 
         return builder.build();
