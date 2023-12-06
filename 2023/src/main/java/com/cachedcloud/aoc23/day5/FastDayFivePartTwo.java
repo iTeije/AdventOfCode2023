@@ -17,8 +17,8 @@ import java.util.stream.LongStream;
 public class FastDayFivePartTwo {
 
     // Configuration
-    private static int SPREAD = 1000;
-    private static double DIFF = 0.1;
+    private static int SPREAD = 500;
+    private static double DIFF = 0.1; // if result is incorrect, lower this parameter
 
     public static void main(String[] args) {
         Timer.start();
