@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class DaySevenPartTwo {
 
@@ -47,7 +46,7 @@ public class DaySevenPartTwo {
         }
 
         final AtomicLong totalWinnings = new AtomicLong();
-        final int[] rank = {1000};
+        final int[] rank = {input.size()};
         handMap.forEach((type, list) -> {
             // Sort the list of hands by highest card
             list.sort((a, b) -> {
@@ -59,7 +58,7 @@ public class DaySevenPartTwo {
                 }
                 return 0;
             });
-            System.out.println(type.name() + ": " + list.stream().map(hand -> hand.hand).collect(Collectors.joining(", ")));
+
             for (Hand hand : list) {
                 totalWinnings.addAndGet((long) hand.bid * rank[0]);
                 rank[0]--;
@@ -83,22 +82,23 @@ public class DaySevenPartTwo {
 
     @AllArgsConstructor
     enum Type {
-        FIVE_OF_A_KIND(6, hand -> {
+        FIVE_OF_A_KIND(hand -> {
             Set<Character> characters = new HashSet<>();
             for (char ch : hand.toCharArray()) {
                 characters.add(ch);
             }
             return characters.size() == 1 || (characters.size() == 2 && characters.contains('J'));
         }),
-        FOUR_OF_A_KIND(5, hand -> {
+        FOUR_OF_A_KIND(hand -> {
             Map<Character, Integer> characters = new HashMap<>();
             for (char ch : hand.toCharArray()) {
                 characters.put(ch, characters.getOrDefault(ch, 0) + 1);
             }
             int jokers = characters.getOrDefault('J', 0);
+            characters.remove('J');
             return characters.containsValue(4) || (jokers > 0 && characters.containsValue(4 - jokers));
         }),
-        FULL_HOUSE(4, hand -> {
+        FULL_HOUSE(hand -> {
             Map<Character, Integer> characters = new HashMap<>();
             for (char ch : hand.toCharArray()) {
                 characters.put(ch, characters.getOrDefault(ch, 0) + 1);
@@ -106,15 +106,16 @@ public class DaySevenPartTwo {
             // After four and five of a kind checks, this will suffice
             return characters.size() == 2 || (characters.size() == 3 && characters.containsKey('J'));
         }),
-        THREE_OF_A_KIND(3, hand -> {
+        THREE_OF_A_KIND(hand -> {
             Map<Character, Integer> characters = new HashMap<>();
             for (char ch : hand.toCharArray()) {
                 characters.put(ch, characters.getOrDefault(ch, 0) + 1);
             }
             int jokers = characters.getOrDefault('J', 0);
+            characters.remove('J');
             return characters.containsValue(3) || (jokers > 0 && characters.containsValue(3 - jokers));
         }),
-        TWO_PAIR(2, hand -> {
+        TWO_PAIR(hand -> {
             Map<Character, Integer> characters = new HashMap<>();
             for (char ch : hand.toCharArray()) {
                 characters.put(ch, characters.getOrDefault(ch, 0) + 1);
@@ -130,7 +131,7 @@ public class DaySevenPartTwo {
 
             return pairCount == 2;
         }),
-        ONE_PAIR(1, hand -> {
+        ONE_PAIR(hand -> {
             Map<Character, Integer> characters = new HashMap<>();
             for (char ch : hand.toCharArray()) {
                 characters.put(ch, characters.getOrDefault(ch, 0) + 1);
@@ -138,9 +139,8 @@ public class DaySevenPartTwo {
             int jokers = characters.getOrDefault('J', 0);
             return characters.containsValue(2) || jokers > 0;
         }),
-        HIGH_CARD(0, hand -> true);
+        HIGH_CARD(hand -> true);
 
-        private final int weight;
         private final Function<String, Boolean> matchFunction;
     }
 }
