@@ -31,7 +31,6 @@ public class DayEightPartTwo {
         List<Integer> pathLenghts = elements.entrySet().stream().filter(mapEntry -> {
             return mapEntry.getKey().endsWith("A");
         }).map(mapEntry -> {
-            System.out.println(mapEntry.getKey());
             Entry pointer = mapEntry.getValue();
             int count = 0;
             for (char action : instructions.toCharArray()) {
