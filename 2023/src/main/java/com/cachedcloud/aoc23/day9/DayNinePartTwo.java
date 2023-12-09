@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DayNinePartOne {
+public class DayNinePartTwo {
 
     public static void main(String[] unusedArgs) {
         List<String> input = new FileReader("input-day9.txt").getInputAsStrings();
@@ -50,14 +50,14 @@ public class DayNinePartOne {
             int count = 0;
             for (int i = 0; i < subSequences.size(); i++) {
                 List<Integer> currentSubSequence = subSequences.get(subSequences.size() - i - 1);
-                int currentLastNumber = currentSubSequence.get(currentSubSequence.size() - 1);
-                count += currentLastNumber;
-                currentSubSequence.add(count);
+                int currentFirstNumber = currentSubSequence.get(0);
+                count = currentFirstNumber - count;
+                currentSubSequence.add(0, count);
             }
 
             sum += count;
         }
 
-        System.out.println("Result (2023 D9P1): " + sum);
+        System.out.println("Result (2023 D9P2): " + sum);
     }
 }
