@@ -52,61 +52,33 @@ public class DayTenPartTwo {
             current = Coordinate.of(startCoordinate.x, startCoordinate.y - 1, Direction.NORTH);
         }
 
-        boolean[][] loop = new boolean[input.size()][input.get(0).length()];
-        loop[startCoordinate.y][startCoordinate.x] = true;
+        List<Coordinate> boundary = new ArrayList<>();
+        boundary.add(startCoordinate);
+
+        long shoelace = calculatePoints(startCoordinate, current);
 
         // Start following the pipes
         do {
-            loop[current.y][current.x] = true;
+            boundary.add(current);
 
             Pipe currentPipe = getPipe(input, current);
             Direction newDirection = currentPipe.getOther(current.from);
-            current = Coordinate.of(current.x + newDirection.xMod, current.y + newDirection.yMod, Direction.getOpposite(newDirection));
+            Coordinate nextPipe = Coordinate.of(current.x + newDirection.xMod, current.y + newDirection.yMod, Direction.getOpposite(newDirection));
+            long additionalArea = calculatePoints(current, nextPipe);
+            shoelace += additionalArea;
+            System.out.println("Shoelace: " + shoelace + " (" + additionalArea + ") " + current + " " + nextPipe);
+            current = nextPipe;
         } while (!current.equals(startCoordinate));
 
-        int horizontalSize = input.get(0).length();
-        int count = 0;
-        List<Coordinate> notChecked = new ArrayList<>();
-        int validTiles = 0;
-        int invalidTiles = 0;
-        for (int y = 0; y < input.size(); y++) {
-            for (int x = 0; x < horizontalSize; x++) {
-                if (loop[y][x]) {
-                    invalidTiles++;
-                    notChecked.add(Coordinate.of(x, y));
-                    continue;
-                }
+        System.out.println("Boundary points (b): " + boundary.size());
+        System.out.println("Shoelace (A): " + Math.abs(shoelace/2));
 
-                validTiles++;
-
-                int cornerPieces = 0;
-                int intersections = 0;
-                if (x + 1 < horizontalSize) {
-                    for (int xRay = x + 1; xRay < horizontalSize; xRay++) {
-                        if (loop[y][xRay]) {
-                            Pipe pipe = getPipe(input, Coordinate.of(xRay, y));
-                            if (pipe.type == PipeType.CORNER) {
-                                cornerPieces++;
-                            } else if (pipe.type == PipeType.UP) {
-                                intersections++;
-                            }
-
-                        }
-                    }
-                }
-
-                // If number of intersections is odd, then the coordinate is inside the loop
-                if ((intersections + (cornerPieces/2)) % 2 == 1) {
-                    System.out.println(x + "," + y + " in loop: " + intersections + "/" + cornerPieces
-                            + " (" + (intersections + (cornerPieces/2)) + " - " + ((intersections + (cornerPieces/2)) % 2) + ")");
-                    count++;
-                }
-            }
-        }
-
-        System.out.println("Result (2023 D10P2): " + count + " tiles in loop");
+        System.out.println("Result (2023 D10P2): " + (Math.abs(shoelace/2) + 1 - (boundary.size()/2)) + " tiles in loop");
     }
 
+    public static long calculatePoints(Coordinate first, Coordinate second) {
+        return ((long) first.x * second.y) - ((long) second.x * first.y);
+    }
 
     public static Pipe getPipe(List<String> input, Coordinate coordinate) {
         char pipe = input.get(coordinate.y).charAt(coordinate.x);
@@ -156,6 +128,11 @@ public class DayTenPartTwo {
         @Override
         public int hashCode() {
             return Objects.hash(x, y);
+        }
+
+        @Override
+        public String toString() {
+            return "{x="+x+",y="+y+",from="+from.name()+"}";
         }
     }
 
