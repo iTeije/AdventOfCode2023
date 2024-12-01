@@ -14,7 +14,7 @@ public class Timer {
 
     public static void finish() {
         finish = System.currentTimeMillis();
-        System.out.println("Took " + (finish - start) + "ms to execute.");
+        System.out.println("\nTook " + (finish - start) + "ms to execute.");
     }
 
 }
