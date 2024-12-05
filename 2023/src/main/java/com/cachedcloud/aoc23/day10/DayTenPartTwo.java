@@ -17,12 +17,12 @@ import java.util.Set;
 public class DayTenPartTwo {
 
     private static final Map<Character, Pipe> PIPES = new HashMap<>() {{
-        put('F', new Pipe(Direction.EAST, Direction.SOUTH, PipeType.CORNER));
-        put('L', new Pipe(Direction.NORTH, Direction.EAST, PipeType.CORNER));
-        put('J', new Pipe(Direction.WEST, Direction.NORTH, PipeType.CORNER));
-        put('7', new Pipe(Direction.WEST, Direction.SOUTH, PipeType.CORNER));
-        put('|', new Pipe(Direction.NORTH, Direction.SOUTH, PipeType.UP));
-        put('-', new Pipe(Direction.WEST, Direction.EAST, PipeType.FLAT));
+        put('F', new Pipe(Direction.EAST, Direction.SOUTH));
+        put('L', new Pipe(Direction.NORTH, Direction.EAST));
+        put('J', new Pipe(Direction.WEST, Direction.NORTH));
+        put('7', new Pipe(Direction.WEST, Direction.SOUTH));
+        put('|', new Pipe(Direction.NORTH, Direction.SOUTH));
+        put('-', new Pipe(Direction.WEST, Direction.EAST));
     }};
 
     public static void main(String[] unusedArgs) {
@@ -61,28 +61,28 @@ public class DayTenPartTwo {
         do {
             boundary.add(current);
 
-            Pipe currentPipe = getPipe(input, current);
-            Direction newDirection = currentPipe.getOther(current.from);
+            // Determine the direction of the following pipe and get that pipe
+            Direction newDirection = getPipe(input, current).getOther(current.from);
             Coordinate nextPipe = Coordinate.of(current.x + newDirection.xMod, current.y + newDirection.yMod, Direction.getOpposite(newDirection));
-            long additionalArea = calculatePoints(current, nextPipe);
-            shoelace += additionalArea;
-            System.out.println("Shoelace: " + shoelace + " (" + additionalArea + ") " + current + " " + nextPipe);
+
+            // Calculate the ??? I have no idea what I'm calculating I just know that it works
+            shoelace += calculatePoints(current, nextPipe);
+
             current = nextPipe;
         } while (!current.equals(startCoordinate));
 
-        System.out.println("Boundary points (b): " + boundary.size());
-        System.out.println("Shoelace (A): " + Math.abs(shoelace/2));
-
-        System.out.println("Result (2023 D10P2): " + (Math.abs(shoelace/2) + 1 - (boundary.size()/2)) + " tiles in loop");
+        // Formula for the number of integer points within the loop: i = A - (b/2) + 1
+        System.out.println("Result (2023 D10P2): " + (Math.abs(shoelace/2) + 1 - (boundary.size()/2)) + " points in loop");
     }
 
     public static long calculatePoints(Coordinate first, Coordinate second) {
+        // Cross-multiply the coordinates
         return ((long) first.x * second.y) - ((long) second.x * first.y);
     }
 
     public static Pipe getPipe(List<String> input, Coordinate coordinate) {
         char pipe = input.get(coordinate.y).charAt(coordinate.x);
-        if (pipe == 'S') return new Pipe(Direction.NULL, Direction.NULL, PipeType.CORNER);
+        if (pipe == 'S') return new Pipe(Direction.NULL, Direction.NULL);
 
         return PIPES.get(pipe);
     }
@@ -91,7 +91,6 @@ public class DayTenPartTwo {
     static class Pipe {
         public final Direction one;
         public final Direction two;
-        public final PipeType type;
 
         public boolean allowsPipeFrom(Direction from) {
             return one.equals(from) || two.equals(from);
@@ -156,11 +155,5 @@ public class DayTenPartTwo {
                 default -> NULL;
             };
         }
-    }
-
-    enum PipeType {
-        CORNER,
-        UP,
-        FLAT
     }
 }
