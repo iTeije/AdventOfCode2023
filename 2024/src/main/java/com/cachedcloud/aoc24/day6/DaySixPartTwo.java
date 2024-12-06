@@ -3,9 +3,15 @@ package com.cachedcloud.aoc24.day6;
 import com.cachedcloud.aoc.Coordinate;
 import com.cachedcloud.aoc.FileReader;
 import com.cachedcloud.aoc.GridUtil;
+import com.cachedcloud.aoc.Timer;
 import lombok.AllArgsConstructor;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DaySixPartTwo {
 
@@ -20,12 +26,14 @@ public class DaySixPartTwo {
         public final int dx;
     }
 
-    public static Direction direction = Direction.NORTH;
+    public static AtomicInteger counter = new AtomicInteger(0);
+    public static ExecutorService executors = Executors.newFixedThreadPool(8);
 
     public static void main(String[] args) {
         FileReader reader = new FileReader("input-day6.txt");
 //        FileReader reader = new FileReader("example-input-day6.txt");
         List<String> input = reader.getInputAsStrings();
+        Timer.start();
         char[][] grid = GridUtil.createCharGrid(input);
 
         Coordinate defaultGuard = null;
@@ -40,77 +48,96 @@ public class DaySixPartTwo {
             }
         }
 
-        int count = 0;
+        List<Future<Void>> futures = new ArrayList<>();
+
         for (int y = 0; y < grid.length; y++) {
-            System.out.println("Processing line " + y);
-            for (int x = 0; x < grid[y].length; x++) {
-                char[][] gridCopy = Arrays.stream(grid)
-                        .map(char[]::clone)
-                        .toArray(char[][]::new);
+            int finalY = y;
+            Coordinate finalDefaultGuard = defaultGuard;
+            futures.add(executors.submit(() -> {
+                processRow(grid, finalY, finalDefaultGuard);
+                return null;
+            }));
+        }
 
-                char c = gridCopy[y][x];
-                if (c == '^') continue;
-                if (c == '#') continue;
-
-                direction = Direction.NORTH;
-                gridCopy[y][x] = '#';
-
-                Set<Entry> entries = new HashSet<>();
-
-                Coordinate coordinate;
-                Coordinate guard = defaultGuard;
-
-                try {
-                    while ((coordinate = move(gridCopy, guard, entries)) != null) {
-                        guard = coordinate;
-                    }
-                    count++;
-                } catch (IndexOutOfBoundsException ignored) {}
+        for (Future<Void> future : futures) {
+            try {
+                future.get();
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
-        System.out.println(count);
+        executors.shutdown();
+
+        Timer.finish();
+        System.out.println(counter.get());
     }
 
-    public static Coordinate move(char[][] grid, Coordinate guard, Set<Entry> entries) throws IndexOutOfBoundsException {
+    public static void processRow(char[][] grid, int y, Coordinate defaultGuard) {
+        System.out.println("Processing row " + y);
+        for (int x = 0; x < grid[0].length; x++) {
+            char[][] gridCopy = Arrays.stream(grid)
+                    .map(char[]::clone)
+                    .toArray(char[][]::new);
+
+            char c = gridCopy[y][x];
+            if (c == '^') continue;
+            if (c == '#') continue;
+
+            Direction direction = Direction.NORTH;
+            gridCopy[y][x] = '#';
+
+            Set<Entry> entries = new HashSet<>();
+
+            Entry entry;
+            Coordinate guard = defaultGuard;
+
+            try {
+                while ((entry = move(gridCopy, guard, entries, direction)) != null) {
+                    guard = entry.coordinate;
+                    direction = entry.approachingDirection;
+                }
+                counter.incrementAndGet();
+            } catch (IndexOutOfBoundsException ignored) {}
+        }
+    }
+
+    public static Entry move(char[][] grid, Coordinate guard, Set<Entry> entries, Direction direction) throws IndexOutOfBoundsException {
         // Handle turns
         if (getCharInDirection(grid, direction, guard) == '#') {
             Entry entry = new Entry(new Coordinate(guard.x + direction.dx, guard.y + direction.dy), direction);
             if (entries.contains(entry)) return null;
             entries.add(entry);
 
-            turn();
-            return guard;
+            direction = turn(direction);
+            return new Entry(guard, direction);
         }
 
-        return new Coordinate(guard.x + direction.dx, guard.y + direction.dy);
+        return new Entry(new Coordinate(guard.x + direction.dx, guard.y + direction.dy), direction);
     }
 
     public static char getCharInDirection(char[][] grid, Direction direction, Coordinate fromCurrent) {
         return grid[fromCurrent.y + direction.dy][fromCurrent.x + direction.dx];
     }
 
-    public static void turn() {
-        if (direction == Direction.NORTH) {
-            direction = Direction.EAST;
-        } else if (direction == Direction.EAST) {
-            direction = Direction.SOUTH;
-        } else if (direction == Direction.SOUTH) {
-            direction = Direction.WEST;
-        } else if (direction == Direction.WEST) {
-            direction = Direction.NORTH;
-        }
+    public static Direction turn(Direction direction) {
+        return switch (direction) {
+            case NORTH -> Direction.EAST;
+            case EAST -> Direction.SOUTH;
+            case SOUTH -> Direction.WEST;
+            case WEST -> Direction.NORTH;
+        };
     }
 
     @AllArgsConstructor
     public static class Entry {
-        public final Coordinate obstruction;
+        public final Coordinate coordinate;
         public final Direction approachingDirection;
 
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Entry entry) {
-                return entry.obstruction.equals(obstruction) && entry.approachingDirection == approachingDirection;
+                return entry.coordinate.equals(coordinate) && entry.approachingDirection == approachingDirection;
             } else return false;
         }
 
