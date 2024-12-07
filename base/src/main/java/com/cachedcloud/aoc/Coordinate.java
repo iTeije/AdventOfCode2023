@@ -25,6 +25,8 @@ public class Coordinate {
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        int result = x;
+        result = 31 * result + y;
+        return result;
     }
 }
