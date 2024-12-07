@@ -6,7 +6,6 @@ import com.cachedcloud.aoc.GridUtil;
 import com.cachedcloud.aoc.Timer;
 import lombok.AllArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,27 +23,26 @@ public class DaySixPartOne {
         public final int dx;
     }
 
-    public static Direction direction = Direction.NORTH;
+    private final List<String> input;
+    private final char[][] grid;
+    private Coordinate guard;
 
-    public static void main(String[] args) {
-        FileReader reader = new FileReader("input-day6.txt");
-//        FileReader reader = new FileReader("example-input-day6.txt");
-        List<String> input = reader.getInputAsStrings();
-        Timer.start();
-        char[][] grid = GridUtil.createCharGrid(input);
-
-        Coordinate guard = null;
+    public DaySixPartOne(List<String> input, char[][] grid) {
+        this.input = input;
+        this.grid = grid;
 
         // Determine guard starting position
         for (int y = 0; y < input.size(); y++) {
             String line = input.get(y);
             int index = line.indexOf('^');
             if (index != -1) {
-                guard = new Coordinate(index, y);
+                this.guard = new Coordinate(index, y);
                 break;
             }
         }
+    }
 
+    public Set<Coordinate> visitedCoordinates() {
         // Default direction
         Set<Coordinate> exploredCoordinates = new HashSet<>();
         exploredCoordinates.add(guard);
@@ -54,9 +52,21 @@ public class DaySixPartOne {
             exploredCoordinates.add(coordinate);
             guard = coordinate;
         }
+        return exploredCoordinates;
+    }
+
+    public static Direction direction = Direction.NORTH;
+
+    public static void main(String[] args) {
+        FileReader reader = new FileReader("input-day6.txt");
+//        FileReader reader = new FileReader("example-input-day6.txt");
+        List<String> input = reader.getInputAsStrings();
+        Timer.start();
+
+        char[][] grid = GridUtil.createCharGrid(input);
+        System.out.println("D6P1: " + new DaySixPartOne(input, grid).visitedCoordinates().size());
 
         Timer.finish();
-        System.out.println(exploredCoordinates.size());
     }
 
     public static Coordinate move(char[][] grid, Coordinate guard) {

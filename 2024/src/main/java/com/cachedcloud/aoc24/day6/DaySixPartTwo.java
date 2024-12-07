@@ -48,13 +48,13 @@ public class DaySixPartTwo {
             }
         }
 
+        Set<Coordinate> coordinatesToCheck = new DaySixPartOne(input, grid).visitedCoordinates();
         List<Future<Void>> futures = new ArrayList<>();
 
-        for (int y = 0; y < grid.length; y++) {
-            int finalY = y;
+        for (Coordinate coordinate : coordinatesToCheck) {
             Coordinate finalDefaultGuard = defaultGuard;
             futures.add(executors.submit(() -> {
-                processRow(grid, finalY, finalDefaultGuard);
+                processCoordinate(grid, coordinate.x, coordinate.y, finalDefaultGuard);
                 return null;
             }));
         }
@@ -73,41 +73,36 @@ public class DaySixPartTwo {
         System.out.println(counter.get());
     }
 
-    public static void processRow(char[][] grid, int y, Coordinate defaultGuard) {
-        System.out.println("Processing row " + y);
-        for (int x = 0; x < grid[0].length; x++) {
-            char[][] gridCopy = Arrays.stream(grid)
-                    .map(char[]::clone)
-                    .toArray(char[][]::new);
+    public static void processCoordinate(char[][] grid, int x, int y, Coordinate defaultGuard) {
+        System.out.println("Processing coordinate (" + x + ", " + y + ")");
+        char[][] gridCopy = Arrays.stream(grid)
+                .map(char[]::clone)
+                .toArray(char[][]::new);
 
-            char c = gridCopy[y][x];
-            if (c == '^') continue;
-            if (c == '#') continue;
+        Direction direction = Direction.NORTH;
+        gridCopy[y][x] = '#';
 
-            Direction direction = Direction.NORTH;
-            gridCopy[y][x] = '#';
+        BitSet bitSet = new BitSet(68765);
 
-            Set<Entry> entries = new HashSet<>();
+        Entry entry;
+        Coordinate guard = defaultGuard;
 
-            Entry entry;
-            Coordinate guard = defaultGuard;
-
-            try {
-                while ((entry = move(gridCopy, guard, entries, direction)) != null) {
-                    guard = entry.coordinate;
-                    direction = entry.approachingDirection;
-                }
-                counter.incrementAndGet();
-            } catch (IndexOutOfBoundsException ignored) {}
-        }
+        try {
+            while ((entry = move(gridCopy, guard, bitSet, direction)) != null) {
+                guard = entry.coordinate;
+                direction = entry.approachingDirection;
+            }
+            counter.incrementAndGet();
+        } catch (IndexOutOfBoundsException ignored) {}
     }
 
-    public static Entry move(char[][] grid, Coordinate guard, Set<Entry> entries, Direction direction) throws IndexOutOfBoundsException {
+    public static Entry move(char[][] grid, Coordinate guard, BitSet bitSet, Direction direction) throws IndexOutOfBoundsException {
         // Handle turns
         if (getCharInDirection(grid, direction, guard) == '#') {
             Entry entry = new Entry(new Coordinate(guard.x + direction.dx, guard.y + direction.dy), direction);
-            if (entries.contains(entry)) return null;
-            entries.add(entry);
+            int hashCode = entry.hashCode();
+            if (bitSet.get(hashCode)) return null;
+            bitSet.set(hashCode);
 
             direction = turn(direction);
             return new Entry(guard, direction);
@@ -143,7 +138,7 @@ public class DaySixPartTwo {
 
         @Override
         public int hashCode() {
-            return super.hashCode();
+            return (coordinate.y * 131 + coordinate.x) * 4 + approachingDirection.ordinal();
         }
     }
 
