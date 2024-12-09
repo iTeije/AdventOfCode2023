@@ -82,7 +82,8 @@ public class DaySixPartTwo {
         Direction direction = Direction.NORTH;
         gridCopy[y][x] = '#';
 
-        BitSet bitSet = new BitSet(68765);
+//        BitSet bitSet = new BitSet(68765);
+        BitSet bitSet = new BitSet(67604);
 
         Entry entry;
         Coordinate guard = defaultGuard;
@@ -138,7 +139,7 @@ public class DaySixPartTwo {
 
         @Override
         public int hashCode() {
-            return (coordinate.y * 131 + coordinate.x) * 4 + approachingDirection.ordinal();
+            return (coordinate.y * 130 + coordinate.x) * 4 + approachingDirection.ordinal();
         }
     }
 
