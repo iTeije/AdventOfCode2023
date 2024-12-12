@@ -1,9 +1,8 @@
 package com.cachedcloud.aoc24.day5;
 
-import com.cachedcloud.aoc.FileReader;
-import com.cachedcloud.aoc.Timer;
+import com.cachedcloud.aoc.common.FileReader;
+import com.cachedcloud.aoc.common.Timer;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.*;
 

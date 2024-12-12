@@ -1,9 +1,9 @@
 package com.cachedcloud.aoc24.day8;
 
-import com.cachedcloud.aoc.Coordinate;
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.location.Coordinate;
+import com.cachedcloud.aoc.common.FileReader;
 import com.cachedcloud.aoc.GridUtil;
-import com.cachedcloud.aoc.Timer;
+import com.cachedcloud.aoc.common.Timer;
 
 import java.util.*;
 

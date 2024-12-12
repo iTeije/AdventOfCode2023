@@ -5,6 +5,9 @@ import java.util.List;
 
 public class GridUtil {
 
+    /*
+     * Deprecated: use ParseUtil.createCharGrid(List<String>)
+     */
     public static char[][] createCharGrid(List<String> input) {
         char[][] grid = new char[input.size()][input.get(0).length()];
         for (int i = 0; i < input.size(); i++) {

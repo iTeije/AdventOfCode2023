@@ -1,6 +1,6 @@
 package com.cachedcloud.aoc23.day1;
 
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.common.FileReader;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +21,7 @@ public class DayOnePartTwo {
     }};
 
     public static void main(String[] args) {
-        FileReader reader = new com.cachedcloud.aoc.FileReader("input-day1.txt");
+        FileReader reader = new FileReader("input-day1.txt");
         List<String> input = reader.getInputAsStrings();
 
         int sum = 0;

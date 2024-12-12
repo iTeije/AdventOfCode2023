@@ -1,6 +1,6 @@
 package com.cachedcloud.aoc24.day7;
 
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.common.FileReader;
 
 import java.util.Arrays;
 import java.util.LinkedList;

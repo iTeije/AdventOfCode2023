@@ -1,10 +1,8 @@
 package com.cachedcloud.aoc23.day8;
 
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.common.FileReader;
 import lombok.AllArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

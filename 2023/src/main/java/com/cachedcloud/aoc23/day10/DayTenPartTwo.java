@@ -1,18 +1,13 @@
 package com.cachedcloud.aoc23.day10;
 
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.common.FileReader;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Queue;
-import java.util.Set;
 
 public class DayTenPartTwo {
 

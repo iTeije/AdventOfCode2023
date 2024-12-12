@@ -1,11 +1,10 @@
 package com.cachedcloud.aoc24.day2;
 
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.common.FileReader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DayTwoPartTwo {
 

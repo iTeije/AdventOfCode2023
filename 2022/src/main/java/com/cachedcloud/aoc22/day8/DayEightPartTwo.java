@@ -1,10 +1,9 @@
 package com.cachedcloud.aoc22.day8;
 
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.common.FileReader;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DayEightPartTwo {
 

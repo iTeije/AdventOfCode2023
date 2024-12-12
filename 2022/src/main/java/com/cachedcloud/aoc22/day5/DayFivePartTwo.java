@@ -1,6 +1,6 @@
 package com.cachedcloud.aoc22.day5;
 
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.common.FileReader;
 
 import java.util.ArrayList;
 import java.util.Arrays;

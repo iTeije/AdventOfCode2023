@@ -1,4 +1,4 @@
-package com.cachedcloud.aoc;
+package com.cachedcloud.aoc.common;
 
 /*
  * Little utility class to print the time to compute

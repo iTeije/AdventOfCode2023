@@ -1,7 +1,7 @@
 package com.cachedcloud.aoc24.day1;
 
-import com.cachedcloud.aoc.FileReader;
-import com.cachedcloud.aoc.Timer;
+import com.cachedcloud.aoc.common.FileReader;
+import com.cachedcloud.aoc.common.Timer;
 
 import java.util.*;
 

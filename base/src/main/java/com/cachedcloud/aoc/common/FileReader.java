@@ -1,4 +1,4 @@
-package com.cachedcloud.aoc;
+package com.cachedcloud.aoc.common;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package com.cachedcloud.aoc;
+package com.cachedcloud.aoc.location;
 
 public class Coordinate {
 

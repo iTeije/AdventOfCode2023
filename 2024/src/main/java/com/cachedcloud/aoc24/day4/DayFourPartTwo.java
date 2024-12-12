@@ -1,7 +1,7 @@
 package com.cachedcloud.aoc24.day4;
 
-import com.cachedcloud.aoc.Coordinate;
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.location.Coordinate;
+import com.cachedcloud.aoc.common.FileReader;
 import com.cachedcloud.aoc.GridUtil;
 import lombok.AllArgsConstructor;
 

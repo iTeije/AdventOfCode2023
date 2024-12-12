@@ -1,8 +1,7 @@
 package com.cachedcloud.aoc22.day3;
 
-import com.cachedcloud.aoc.FileReader;
+import com.cachedcloud.aoc.common.FileReader;
 
-import javax.swing.*;
 import java.util.List;
 
 public class DayThreePartOne {

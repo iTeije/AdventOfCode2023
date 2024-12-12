@@ -1,10 +1,10 @@
 package com.cachedcloud.aoc24.day12;
 
-import com.cachedcloud.aoc.Coordinate;
-import com.cachedcloud.aoc.Direction;
-import com.cachedcloud.aoc.FileReader;
-import com.cachedcloud.aoc.GridUtil;
-import com.cachedcloud.aoc.grid.CharGrid;
+import com.cachedcloud.aoc.ParseUtil;
+import com.cachedcloud.aoc.location.Coordinate;
+import com.cachedcloud.aoc.location.Direction;
+import com.cachedcloud.aoc.common.FileReader;
+import com.cachedcloud.aoc.grid.Grid;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -19,8 +19,7 @@ public class DayTwelvePartTwo {
         FileReader reader = new FileReader("input-day12.txt");
 //        FileReader reader = new FileReader("example-input-day12.txt");
 
-        char[][] input = GridUtil.createCharGrid(reader.getInputAsStrings());
-        CharGrid grid = new CharGrid(input);
+        Grid<Character> grid = ParseUtil.createCharGrid(reader.getInputAsStrings());
 
         LinkedList<Coordinate> queue = new LinkedList<>();
         Set<Coordinate> visited = new HashSet<>();
@@ -44,8 +43,8 @@ public class DayTwelvePartTwo {
                     // Get neighbouring coordinates
                     grid.getNeighbouringCoordinates(current).forEach((direction, neighbour) -> {
                         // Get garden plot type and check if it is the type that we are looking for
-                        char neighbourChar = grid.charAt(neighbour);
-                        if (grid.charAt(coordinate) == neighbourChar) {
+                        char neighbourChar = grid.valueAt(neighbour);
+                        if (grid.valueAt(coordinate) == neighbourChar) {
                             queue.push(neighbour);
                         } else {
                             // Store edge

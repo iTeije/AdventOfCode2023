@@ -1,11 +1,8 @@
 package com.cachedcloud.aoc23.day10;
 
-import com.cachedcloud.aoc.FileReader;
-import com.cachedcloud.aoc23.day3.DayThreePartOne;
-import com.cachedcloud.aoc23.day3.DayThreePartTwo;
+import com.cachedcloud.aoc.common.FileReader;
 import lombok.AllArgsConstructor;
 
-import javax.swing.plaf.SplitPaneUI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

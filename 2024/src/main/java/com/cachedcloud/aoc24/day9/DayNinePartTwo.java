@@ -1,12 +1,10 @@
 package com.cachedcloud.aoc24.day9;
 
-import com.cachedcloud.aoc.FileReader;
-import com.cachedcloud.aoc.Timer;
+import com.cachedcloud.aoc.common.FileReader;
+import com.cachedcloud.aoc.common.Timer;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
 import java.util.List;
 
 public class DayNinePartTwo {
