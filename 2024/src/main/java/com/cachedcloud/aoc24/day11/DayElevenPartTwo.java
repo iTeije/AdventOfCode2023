@@ -3,9 +3,7 @@ package com.cachedcloud.aoc24.day11;
 import com.cachedcloud.aoc.common.FileReader;
 import com.cachedcloud.aoc.common.Timer;
 
-import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class DayElevenPartTwo {
 
@@ -14,26 +12,26 @@ public class DayElevenPartTwo {
         FileReader reader = new FileReader("input-day11.txt");
 //        FileReader reader = new FileReader("example-input-day11.txt");
 
-        Map<Long, BigInteger> stones = new HashMap<>(); // map stone numbers (k) to occurrences (v)
+        Map<Long, Long> stones = new HashMap<>(); // map stone numbers (k) to occurrences (v)
 
         // Read input
         Arrays.stream(reader.getInputAsStrings().get(0).split(" ")).map(Long::parseLong).forEach(stone -> {
-            stones.compute(stone, (k, v) -> v == null ? BigInteger.ONE : v.add(BigInteger.valueOf(1L)));
+            stones.compute(stone, (k, v) -> v == null ? 1 : v + 1);
         });
 
-        for (int iteration = 0; iteration < 100000; iteration++) {
-            System.out.println("Iteration: " + iteration);
-            Map<Long, List<BigInteger>> modifications = new HashMap<>();
+        for (int iteration = 0; iteration < 75; iteration++) {
+            Map<Long, Long> modifications = new HashMap<>();
 
             // Loop through stones from previous iteration
-            for (Map.Entry<Long, BigInteger> entry : stones.entrySet()) {
+            for (Map.Entry<Long, Long> entry : stones.entrySet()) {
                 long number = entry.getKey();
-                BigInteger occurrences = entry.getValue();
+                long occurrences = entry.getValue();
 
                 // Rule 1: replace zeroes with ones
                 if (number == 0) {
-                    modifications.computeIfAbsent(number, k -> new ArrayList<>()).add(occurrences.negate());
-                    modifications.computeIfAbsent(1L, k -> new ArrayList<>()).add(occurrences);
+                    applyModifications(modifications,
+                            number, -occurrences,
+                            1L, occurrences);
                     continue;
                 }
 
@@ -44,43 +42,35 @@ public class DayElevenPartTwo {
                     Long firstNumber = Long.parseLong(numberStr.substring(0, middleIndex));
                     Long secondNumber = Long.parseLong(numberStr.substring(middleIndex));
 
-                    modifications.computeIfAbsent(number, k -> new ArrayList<>()).add(occurrences.negate());
-                    modifications.computeIfAbsent(firstNumber, k -> new ArrayList<>()).add(occurrences);
-                    modifications.computeIfAbsent(secondNumber, k -> new ArrayList<>()).add(occurrences);
+                    applyModifications(modifications,
+                            number, -occurrences,
+                            firstNumber, occurrences,
+                            secondNumber, occurrences);
                     continue;
                 }
 
                 // Rule 3: multiply old value by 2024
-                modifications.computeIfAbsent(number, k -> new ArrayList<>()).add(occurrences.negate());
-                modifications.computeIfAbsent(number*2024, k -> new ArrayList<>()).add(occurrences);
+                applyModifications(modifications,
+                        number, -occurrences,
+                        number * 2024, occurrences);
             }
 
             // Apply modifications
-            for (Map.Entry<Long, List<BigInteger>> modification : modifications.entrySet()) {
-
-                final BigInteger[] main = {BigInteger.ZERO};
-                modification.getValue().forEach(bigInteger -> {
-                    main[0] = main[0].add(bigInteger);
-                });
+            for (Map.Entry<Long, Long> modification : modifications.entrySet()) {
                 stones.compute(modification.getKey(), (k, v) -> {
                     if (v == null) {
-                        return main[0];
+                        return modification.getValue();
                     } else {
-                        return v.add(main[0]);
+                        return v + modification.getValue();
                     }
                 });
             }
 
             // Remove 0 values to avoid unnecessary compute power when map grows larger
-            stones.values().removeIf(val -> Objects.equals(val, BigInteger.ZERO));
+            stones.values().removeIf(val -> val == 0);
         }
 
-        AtomicReference<BigInteger> bigInteger = new AtomicReference<>(BigInteger.valueOf(0L));
-        stones.values().stream().forEach(val -> {
-            bigInteger.set(bigInteger.get().add(val));
-        });
-
-        System.out.println("D11P2: " + bigInteger.get().toString() + " (unique numbers: " + stones.size() + ")");
+        System.out.println("D11P2: " + stones.values().stream().mapToLong(Long::longValue).sum() + " (unique numbers: " + stones.size() + ")");
         Timer.finish();
     }
 
