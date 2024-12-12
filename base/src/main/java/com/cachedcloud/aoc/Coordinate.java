@@ -1,7 +1,5 @@
 package com.cachedcloud.aoc;
 
-import java.util.Objects;
-
 public class Coordinate {
 
     public int x;
@@ -10,6 +8,22 @@ public class Coordinate {
     public Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Coordinate relative(Direction direction, int distance) {
+        return Coordinate.of(this.x + (direction.getDx() * distance), this.y + (direction.getDy() * distance));
+    }
+
+    // This only works for horizontal/vertical and not for orientations
+    public Direction directionTo(Coordinate other) {
+        int dx = other.x - this.x;
+        int dy = other.y - this.y;
+
+        if (dy > 0) return Direction.SOUTH;
+        if (dy < 0) return Direction.NORTH;
+        if (dx > 0) return Direction.EAST;
+        if (dx < 0) return Direction.WEST;
+        return Direction.CENTER;
     }
 
     public static Coordinate of(int x, int y) {
