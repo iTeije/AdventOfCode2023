@@ -51,4 +51,24 @@ public class GridUtil {
         list.forEach(System.out::println);
     }
 
+    public static char[][] createAndFill(int wide, int tall, char fill) {
+        char[][] array = new char[tall][wide];
+        for (int y = 0; y < tall; y++) {
+            for (int x = 0; x < wide; x++) {
+                array[y][x] = fill;
+            }
+        }
+        return array;
+    }
+
+    public static Character[][] createAndFillObject(int wide, int tall, Character fill) {
+        Character[][] array = new Character[tall][wide];
+        for (int y = 0; y < tall; y++) {
+            for (int x = 0; x < wide; x++) {
+                array[y][x] = fill;
+            }
+        }
+        return array;
+    }
+
 }

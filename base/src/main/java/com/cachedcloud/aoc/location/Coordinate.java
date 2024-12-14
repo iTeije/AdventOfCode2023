@@ -30,6 +30,12 @@ public class Coordinate {
         return new Coordinate(x, y);
     }
 
+    public static Coordinate of(String input) {
+        // x,y
+        String[] parts = input.split(",");
+        return Coordinate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
