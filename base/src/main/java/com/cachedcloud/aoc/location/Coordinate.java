@@ -26,6 +26,10 @@ public class Coordinate {
         return Direction.CENTER;
     }
 
+    public Coordinate dupe() {
+        return new Coordinate(this.x, this.y);
+    }
+
     public static Coordinate of(int x, int y) {
         return new Coordinate(x, y);
     }
@@ -34,6 +38,14 @@ public class Coordinate {
         // x,y
         String[] parts = input.split(",");
         return Coordinate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+    }
+
+    @Override
+    public String toString() {
+        return "Coordinate{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
     }
 
     @Override
