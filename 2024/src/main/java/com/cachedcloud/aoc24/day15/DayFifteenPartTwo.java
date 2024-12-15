@@ -78,65 +78,35 @@ public class DayFifteenPartTwo {
             }
 
             // Handle horizontal box moves
-            if (direction == Direction.WEST || direction == Direction.EAST) {
-                Coordinate nextBox = next.dupe();
-                int boxesToMove = 1;
-                boolean canMove = true;
-                // Make sure there is space to move the boxes into
-                while (true) {
-                    nextBox = nextBox.relative(direction, 1);
-                    Character valAt = grid.valueAt(nextBox);
-                    if (valAt == '#') {
-                        canMove = false;
-                        break;
-                    } else if (valAt == '.') {
-                        break;
-                    } else {
-                        boxesToMove++;
-                    }
-                }
-
-                if (canMove) {
-                    // Move over all characters to the left or right
-                    for (int i = boxesToMove; i > 0; i--) {
-                        grid.setValue(next.relative(direction, i), grid.valueAt(next.relative(direction, i - 1)));
-                    }
-                    // Update robot position
-                    grid.setValue(current, '.');
-                    grid.setValue(next, '@');
-                    current = next;
-                }
-            } else {
-                Map<Coordinate, Character> branches = getBranchedCoordinates(grid, direction, next);
-                // Check if the value associated with any of the coordinates is a wall
-                boolean blocked = branches.values().stream().anyMatch(branchChar -> branchChar == '#');
-                // Skip if blocked
-                if (blocked) {
-                    continue;
-                }
-                // Move all related characters, starting from the opposite direction
-                Set<Coordinate> updated = new HashSet<>();
-                branches.forEach((coordinate, valueAt) -> {
-                    if (valueAt != '.') {
-                        // Update the character at the coordinate one down
-                        Coordinate newCoordinate = coordinate.relative(direction, 1);
-                        updated.add(newCoordinate);
-                        grid.setValue(newCoordinate, valueAt);
-
-                        // ONLY replace the old coordinate with empty space if it was not already updated
-                        // A non-updated value means that either an update is yet to come (which will override the current empty space),
-                        // or there will be no update and it is actually empty
-                        if (!updated.contains(coordinate)) {
-                            grid.setValue(coordinate, '.');
-                        }
-                    }
-                });
-
-                // Update current robot position
-                grid.setValue(current, '.');
-                grid.setValue(next, '@');
-                current = next;
+            Map<Coordinate, Character> branches = getBranchedCoordinates(grid, direction, next);
+            // Check if the value associated with any of the coordinates is a wall
+            boolean blocked = branches.values().stream().anyMatch(branchChar -> branchChar == '#');
+            // Skip if blocked
+            if (blocked) {
+                continue;
             }
+            // Move all related characters, starting from the opposite direction
+            Set<Coordinate> updated = new HashSet<>();
+            branches.forEach((coordinate, valueAt) -> {
+                if (valueAt != '.') {
+                    // Update the character at the coordinate one down
+                    Coordinate newCoordinate = coordinate.relative(direction, 1);
+                    updated.add(newCoordinate);
+                    grid.setValue(newCoordinate, valueAt);
+
+                    // ONLY replace the old coordinate with empty space if it was not already updated
+                    // A non-updated value means that either an update is yet to come (which will override the current empty space),
+                    // or there will be no update and it is actually empty
+                    if (!updated.contains(coordinate)) {
+                        grid.setValue(coordinate, '.');
+                    }
+                }
+            });
+
+            // Update current robot position
+            grid.setValue(current, '.');
+            grid.setValue(next, '@');
+            current = next;
         }
 
         // Calculate GPS coordinates of boxes
@@ -161,21 +131,24 @@ public class DayFifteenPartTwo {
         map.put(box, grid.valueAt(box));
         map.put(otherPart, grid.valueAt(otherPart));
 
+        boolean horizontal = branchDirection == Direction.EAST || branchDirection == Direction.WEST;
         // Branch out to other boxes/characters in the provided direction
-        Coordinate next = box.relative(branchDirection, 1);
+        Coordinate next = box.relative(branchDirection, horizontal ? 2 : 1);
         Character nextVal = grid.valueAt(next);
         // If branch contains square brackets, branch out further
         if (nextVal == '[' || nextVal == ']') {
             map.putAll(getBranchedCoordinates(grid, branchDirection, next));
         } else map.put(next, nextVal);
 
-        // Branch out to other boxes/characters in the provided direction, going from the other position involved in the current box
-        Coordinate nextFromOther = otherPart.relative(branchDirection, 1);
-        Character nextValOther = grid.valueAt(nextFromOther);
-        // Branch out if the branch contains square brackets and avoid duplicate computing
-        if ((nextValOther == '[' || nextValOther == ']') && nextValOther != grid.valueAt(otherPart)) {
-            map.putAll(getBranchedCoordinates(grid, branchDirection, nextFromOther));
-        } else map.put(nextFromOther, nextValOther);
+        if (!horizontal) {
+            // Branch out to other boxes/characters in the provided direction, going from the other position involved in the current box
+            Coordinate nextFromOther = otherPart.relative(branchDirection, 1);
+            Character nextValOther = grid.valueAt(nextFromOther);
+            // Branch out if the branch contains square brackets and avoid duplicate computing
+            if ((nextValOther == '[' || nextValOther == ']') && nextValOther != grid.valueAt(otherPart)) {
+                map.putAll(getBranchedCoordinates(grid, branchDirection, nextFromOther));
+            } else map.put(nextFromOther, nextValOther);
+        }
 
         return map;
     }
