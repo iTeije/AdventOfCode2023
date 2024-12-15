@@ -36,7 +36,6 @@
             <groupId>com.google.mug</groupId>
             <artifactId>mug</artifactId>
             <version>8.2</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
