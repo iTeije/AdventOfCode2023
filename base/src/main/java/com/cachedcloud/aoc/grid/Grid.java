@@ -54,6 +54,10 @@ public class Grid<T> {
         return this.grid.put(coordinate, value);
     }
 
+    public Coordinate findFirst(T value) {
+        return grid.entrySet().stream().filter(e -> e.getValue().equals(value)).findFirst().get().getKey();
+    }
+
     public Map<Direction, T> getNeighbours(Coordinate from, boolean diagonal) {
         Map<Direction, T> neighbours = new HashMap<>();
         for (Direction direction : Direction.getDirections(diagonal)) {
