@@ -115,7 +115,7 @@ public class DayFifteenPartTwo {
             return 0L;
         }).sum();
 
-        System.out.println("D15P1: " + count);
+        System.out.println("D15P2: " + count);
     }
 
     private static Coordinate getOtherBoxPart(Grid<Character> grid, Coordinate from) {
