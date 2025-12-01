@@ -2,7 +2,6 @@ package com.cachedcloud.aoc24.day13;
 
 import com.cachedcloud.aoc.common.FileReader;
 import com.cachedcloud.aoc.location.BigCoordinate;
-import com.cachedcloud.aoc.location.Coordinate;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,9 +3,6 @@ package com.cachedcloud.aoc24.day14;
 import com.cachedcloud.aoc.common.FileReader;
 import com.cachedcloud.aoc.location.Coordinate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DayFourteenPartOne {
 
     public static void main(String[] args) {
