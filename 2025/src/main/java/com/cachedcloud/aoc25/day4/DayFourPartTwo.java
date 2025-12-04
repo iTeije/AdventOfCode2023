@@ -10,49 +10,32 @@ public class DayFourPartTwo {
 //        FileReader reader = new FileReader("example-input-day4.txt");
 
         char[][] charGrid = GridUtil.createCharGrid(reader.getInputAsStrings());
+        
         int count = 0;
+        int iteration = 0;
         while (true) {
-            int result = remove(charGrid);
+            int result = remove(charGrid, iteration);
 
             if (result == 0) break;
             count += result;
+            iteration++;
         }
 
-
-        System.out.println("D4P1: " + count);
+        System.out.println("D4P2: " + count);
     }
 
-    public static int remove(char[][] charGrid) {
+    public static int remove(char[][] charGrid, int iteration) {
         int count = 0;
-        int[][] removeQueue = new int[charGrid.length][charGrid[0].length];
 
-        int y = 0;
-        for (char[] line : charGrid) {
-            int x = 0;
-            for (char roll : line) {
-                if (roll == '@' && canAccess(charGrid, x, y)) {
+        for (int y = 0; y < charGrid.length; y++) {
+            for (int x = 0; x < charGrid[0].length; x++) {
+                if ((charGrid[y][x] == '@' || charGrid[y][x] == iteration) && canAccess(charGrid, x, y)) {
                     count++;
-                    removeQueue[y][x] = 1;
-                } else {
-                    removeQueue[y][x] = 0;
+                    charGrid[y][x] = (char) iteration;
                 }
-                x++;
             }
-            y++;
         }
 
-        // Update char grid
-        int yLine = 0;
-        for (int[] line : removeQueue) {
-            int x = 0;
-            for (int val : line) {
-                if (val == 1) {
-                    charGrid[yLine][x] = '.';
-                }
-                x++;
-            }
-            yLine++;
-        }
         return count;
     }
 
